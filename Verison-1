@@ -1,0 +1,44 @@
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+    double length,
+    width,
+    height,
+    volume,
+    standardRate,
+    shippingCost,
+    salesTax,
+    perDollar,
+    total;
+    // Software information.
+    cout << "East County Box Company" << endl;
+    cout << "\n" << "Sales Program (version 1.5)" << endl;
+    // Initializing the calculator portion of the program.
+    cout << "\n" << "Enter Package Dimensions (feet):" << endl;
+    cout << "Length: ";
+    cin >> length;
+    cout <<"Width: ";
+    cin >> width;
+    cout <<"Height: "; 
+    cin >> height;
+    cout << endl;
+    volume = length * width * height;
+    // This will display the calculated package volume.
+    cout << "Package Volume: ";
+    cout << volume << " cubic feet" << endl;
+    // This portion of code calculates the shipping cost, sales tax, and total based on the volume of the package.
+    standardRate = 2.50;
+    shippingCost = standardRate * volume;
+    perDollar = 0.0775;
+    salesTax = perDollar * shippingCost;
+    total = shippingCost + salesTax;
+    // This will display the shipping cost, sales tax, and total.
+    cout << setprecision(2) << fixed;
+	cout <<"\n" << setw(45) << left << "Shipping Cost ($2.50 per cubic foot) " << setw(2) << left << "$ " << setw(8) << right << shippingCost << endl;
+	cout << setw(45) << left << "Sales Tax (0.0775) " << setw(2) << left << "$ " << setw(8) << right << salesTax << endl << endl;
+	cout << setw(45) << left << "Total " << setw(2) << left << "$ " << setw(8) << right << total << endl;
+    
+    return 0;   
+}
