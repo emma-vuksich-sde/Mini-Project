@@ -1,0 +1,392 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+using namespace std;
+
+// Function prototypes.
+double addPackage();
+double payment(double);
+
+// Constant variables.
+const double smallRate = 1.50;
+const double mediumRate = 2.50;
+const double largeRate = 3.00;
+const double perDollar = 0.0775;
+const double deliveryRateStandard = 0;
+const double deliveryRateFast = 1.50;
+const double deliveryRateAir = 3.00;
+
+struct calculatorStr
+{
+    int container;
+    double length;
+    double width;
+    double height;
+    double volume;
+    double premium;
+    double shippingCost;
+    double premiumDelivery;
+    char option;
+};
+
+calculatorStr getVolume(calculatorStr);
+calculatorStr totals(calculatorStr);
+calculatorStr packageVolume(calculatorStr);
+calculatorStr shippingCosts(calculatorStr);
+calculatorStr calculateShipping(calculatorStr);
+calculatorStr deliveryMethod(calculatorStr);
+
+int main() 
+{
+    double premiumTotal = 0;
+    double containerTotal = 0;
+    double subtotal = 0;
+    double salesTax = 0;
+    double total = 0;
+    int i;
+    
+    calculatorStr allData;
+
+    cout << "East County Box Company" << endl;
+    cout << "\n" << "Sales Program (version 1.5)" << "\n" << endl;
+    
+    for (int count = i; count <= i; count++)
+    {
+        do
+        {
+            // Increases the label of each container.
+            allData.container++;
+            
+            // Asks user to enter package dimensions.
+            allData = getVolume(allData);
+    
+            // Re-enter values if package volume exceeds 65 cf.    
+            while (allData.volume > 65) 
+            {
+                cout << "This container exceeds the 65 cubic foot limit. Please input again." << "\n";
+                allData = getVolume(allData);
+            }
+        
+            // Calculates the shipping cost.
+            allData = calculateShipping(allData);
+    
+            // Displays the calculated package volume.
+            packageVolume(allData);
+
+            // Outputs the shipping cost based on the volume of the package.
+            allData = shippingCosts(allData);
+            
+            // Displays the delivery options and requests user input.
+            allData = deliveryMethod(allData);
+            
+            // Calculates the container total.
+            containerTotal += allData.shippingCost;
+            
+            // Calculates the premium delivery fee.
+            premiumTotal += allData.premium;
+            
+        } while (addPackage() == true);
+    }
+    
+    // Calculates the subtotal, sales tax, and grand total.
+    subtotal = containerTotal + premiumTotal;
+    salesTax = subtotal * perDollar;
+    total = subtotal + salesTax;
+    
+    // Displays the container total, premium delivery fee, subtotal, sales tax, and total.
+    cout << "\n" << "\n" << "\n" << "\n" << "\n";
+    cout << setprecision(2) << fixed;
+    cout << setw(75) << left << "Container Total" << setw(2) << left << "$ " << setw(8) << right << containerTotal << endl;
+    cout << setw(75) << left << "Premium Delivery" << setw(2) << left << "$ " << setw(8) << right << premiumTotal << endl;
+    cout << "\n" << setw(75) << left << "Subtotal" << setw(2) << left << "$ " << setw(8) << right << subtotal << endl;
+    cout << setw(75) << left << "Sales Tax (0.0775)" << setw(2) << left << "$ " << setw(8) << right << salesTax << endl << endl;
+    cout << setw(75) << left << "Total" << setw(2) << left << "$ " << setw(8) << right << total << endl;
+    
+    payment(total);
+    
+    return 0;
+}
+
+// Requests and recieves package dimensions from user and outputs volume.
+calculatorStr getVolume(calculatorStr allData)
+{
+    cout << "\n" << "Enter dimensions for container #";
+    cout << setprecision(0) << allData.container;
+    cout << " (feet):" << endl;
+    cout << "Length: ";
+    cin >> allData.length;
+    cout <<"Width: ";
+    cin >> allData.width;
+    cout <<"Height: "; 
+    cin >> allData.height;
+    cout << endl;
+    
+    allData.volume = allData.length * allData.width * allData.height;
+    
+    return allData;
+}
+
+ // Displays the calculated package volume.
+calculatorStr packageVolume(calculatorStr allData)
+{
+    cout << "Volume of container #";
+    cout << setprecision(0) << fixed << allData.container;
+    cout << " is " << allData.volume << " cubic feet";
+    
+    return allData;
+}
+
+// Asks user if another package is being added to the transaction.
+double addPackage()
+{
+    char answer;
+    cout << "\n" << "Add another container? (Y/N) ";
+    cin >> answer;
+    if (answer != 'Y' && answer != 'N')
+    {
+        cout << "\n" << "Please enter Y or N to continue." << endl;
+        cout << "\n" << "Add another container? (Y/N) ";
+        cin >> answer;
+    }
+    
+    while (answer == 'N')
+    {
+        break;
+    }
+    
+    return answer == 'Y';
+}
+
+// Payment methods: cash, check, credit.
+double payment(double total)
+{
+    char type, creditCard;
+    double cash, change;
+    string driverLicense, fourDigits;
+    
+    cout << "\n" << "Payment (1. Cash, 2. Check, 3. Card): ";
+    cin >> type;
+
+    if (type != '1' && type != '2' && type != '3')
+    {
+        cout << "\n" << "Please enter 1, 2, or 3 to continue.";
+        cout << "\n" << "Payment (1. Cash, 2. Check, 3. Card): ";
+        cin >> type;
+    }
+    
+    if (type == '1')
+    {   
+        if (total < 99.99)
+        {
+            cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Accepted:" << setw(5) << left << "$" << setw(8) << right;
+            cin >> cash;
+        }
+        if (total >= 100.00)
+        {
+            cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Accepted:" << setw(4) << left << "$" << setw(8) << right;
+            cin >> cash;
+        }
+        change = cash - total;
+        cout << setprecision(2) << fixed << setw(75) << left << "Change:" << setw(2) << left << "$ " << setw(8) << right << change << endl;
+    }
+    
+    if (type == '2')
+    {
+        cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Enter Driver License No:" << setw(0) << left << "" << setw(8) << right;
+        cin >> driverLicense;
+        while (driverLicense.size() != 8)
+        {
+            cout << "\n" << "California driver's license require eight digits." << endl;
+            cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Enter Driver License No:" << setw(0) << left << "" << setw(8) << right;
+            cin >> driverLicense;
+        }
+        while (!isalpha(driverLicense[0]))
+        {
+            cout << "\n" << "First digit should be a capital letter." << endl;
+            cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Enter Driver License No:" << setw(0) << left << "" << setw(8) << right;
+            cin >> driverLicense;
+        }
+        int flag = 1;
+        while (flag == 1)
+        {
+            flag = 0;
+            for (int i = 1; i < driverLicense.size(); i++)
+            {
+                if(!isdigit(driverLicense[i]))
+                {
+                    flag = 1;
+                }
+            }
+            if (flag == 1)
+            {
+                cout << "\n" << "Last seven digits should be numbers." << endl;
+                cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Enter Driver License No:" << setw(0) << left << "" << setw(8) << right;
+                cin >> driverLicense;
+            }
+        }
+        cout << setprecision(2) << fixed << setw(75) << left << "Accepted Check Payment:" << setw(2) << left << "$ " << setw(8) << right << total << endl;
+    }
+    
+    if (type == '3')
+    {
+        cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Visa (V) or Mastercard (M):" << setw(0) << left << "" << setw(8) << right;
+        cin >> creditCard;
+        
+        while (creditCard != 'V' && creditCard != 'M')
+        {
+            cout << "\n" << "Please enter V for Visa or M for Mastercard to continue." << endl;
+            cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Visa (V) or Mastercard (M):" << setw(0) << left << "" << setw(8) << right;
+            cin >> creditCard;
+        }
+        cout << setprecision(2) << fixed << setw(75) << left << "Enter Last Four Digits of Card:" << setw(0) << left << "" << setw(8) << right;
+        cin >> fourDigits;
+        int flag = 1;
+        while (fourDigits.size() != 4 || flag == 1)
+        {
+            if (fourDigits.size() != 4)
+            {
+                cout << "\n" << "Please enter valid four digits to continue." << endl;
+                cout << setprecision(2) << fixed << "\n" << setw(75) << left << "Enter the last four digits of the card:" << setw(0) << left << "" << setw(8) << right;
+                cin >> fourDigits;
+            }
+            flag = 0;
+            for (int i = 0; i < fourDigits.size(); i++)
+            {
+                if(!isdigit(fourDigits[i]))
+                {
+                    flag = 1;
+                }
+            }
+            if (flag == 1)
+            {
+                cout << "\n" << "Please enter valid four digits to continue." << endl;
+                cout << setprecision(2) << fixed<< "\n" << setw(75) << left << "Enter the last four digits of the card:" << setw(0) << left << "" << setw(8) << right;
+                cin >> fourDigits;
+            }
+        }
+        
+        if (creditCard == 'V')
+        {
+            cout << "Accepted Visa ending in " << fourDigits << " for the amount of:";
+            cout << setprecision(2) << fixed << setw(28) << left << "" << setw(2) << left << "$ " << setw(8) << right << total << endl;
+        }
+        
+        if (creditCard == 'M')
+        {
+            cout << "Accepted Mastercard ending in " << fourDigits << " for the amount of:";
+            cout << setprecision(2) << fixed << setw(22) << left << "" << setw(2) << left << "$ " << setw(8) << right << total << endl;
+        }
+    }
+    return change;
+}
+
+calculatorStr deliveryMethod(calculatorStr allData)
+{
+    allData.premium = 0;
+    
+    if (allData.volume < 30)
+    {
+        cout << "\n" << "How is this container to be shipped (choose one):" << endl;
+        cout << "\n" << "(1) Standard - (one to two weeks) - No change to the price" << endl;
+        cout << "(2) Fast Ground - (3 to 5 business days) - Extra $1.50 per cubic foot" << endl;
+        cout << "(3) Air - (1 to 2 business days) - Only applies to packages under 30 cubic feet - Extra $3.00 per cubic foot" << endl;
+        cout << "\n" << "Delivery Method: ";
+    }
+    
+    if (allData.volume >= 30)
+    {
+        cout << "\n" << "How is this container to be shipped (choose one):" << endl;
+        cout << "\n" << "(1) Standard - (one to two weeks) - No change to the price" << endl;
+        cout << "(2) Fast Ground - (3 to 5 business days) - Extra $1.50 per cubic foot" << endl;
+        cout << "\n" << "Delivery Method: ";
+    }
+    
+    cin >> allData.option;
+    
+    if (allData.option != '1' && allData.option != '2' && allData.option != '3')
+    {
+        cout << "\n" << "Please enter 1, 2, or 3 to continue." << endl;
+        cout << "\n" << "Delivery Method: ";
+        cin >> allData.option;
+    }
+    
+    if (allData.volume >= 30 && allData.option == '3')
+    {
+        cout << "\n" << "Air delivery only applies to packages under 30 cubic feet. Please try again." << endl;
+        cout << "\n" << "Delivery Method: ";
+        cin >> allData.option;
+    }
+    
+    switch (allData.option)
+    {
+        case '1' : 
+        {
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(75) << left << "Standard:" << setw(2) << left << "$ " << setw(8) << right << deliveryRateStandard << endl;
+        }
+        break;
+        
+        case '2' :
+        {
+            allData.premium = allData.volume * deliveryRateFast;
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(75) << left << "Fast Ground ($1.50 per cu ft):" << setw(2) << left << "$ " << setw(8) << right << allData.premium << endl;
+        }
+        break;
+        
+        case '3' :
+        {
+            allData.premium = allData.volume * deliveryRateAir;
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(75) << left << "Air ($3.00 per cu ft):" << setw(2) << left << "$ " << setw(8) << right << allData.premium << endl;
+        }
+        break;
+    }
+    
+    return allData;
+}
+
+calculatorStr calculateShipping(calculatorStr allData)
+{
+    if (allData.volume)
+    {
+        if (allData.volume < 15)
+        {
+            allData.shippingCost = smallRate * allData.volume;
+        }
+        else if (allData.volume > 15, allData.volume < 45)
+        {
+            allData.shippingCost = mediumRate * allData.volume;
+        }
+        else if (allData.volume > 45)
+        {
+            allData.shippingCost = largeRate * allData.volume;
+        }
+    }
+    
+    return allData;
+}
+
+calculatorStr shippingCosts(calculatorStr allData)
+{
+    if (allData.volume)
+    {
+        if (allData.volume < 15)
+        {
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(75) << left << "Small Package ($1.50 per cubic foot)" << setw(2) << left << "$ " << setw(8) << right << allData.shippingCost << endl;
+        }
+        else if (allData.volume > 15, allData.volume < 45)
+        {
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(75) << left << "Medium Package ($2.50 per cubic foot)" << setw(2) << left << "$ " << setw(8) << right << allData.shippingCost << endl;
+        }
+        else if (allData.volume > 45)
+        {
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(75) << left << "Large Package ($3.00 per cubic foot)" << setw(2) << left << "$ " << setw(8) << right << allData.shippingCost << endl;
+        }
+    }
+    
+    return allData;
+}
