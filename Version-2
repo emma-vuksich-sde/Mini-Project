@@ -1,0 +1,102 @@
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+   
+    double length = 0,
+    width = 0,
+    height = 0,
+    volume,
+    shippingCost,
+    standardRate,
+    smallRate,
+    mediumRate,
+    largeRate,
+    salesTax,
+    perDollar,
+    total;
+    // Software information.
+    cout << "East County Box Company" << endl;
+    cout << "\n" << "Sales Program (version 1.5)" << endl;
+    // Initializing the calculator portion of the program.
+    cout << "\n" << "Enter Package Dimensions (feet):" << endl;
+    cout << "Length: ";
+    cin >> length;
+    cout <<"Width: ";
+    cin >> width;
+    cout <<"Height: "; 
+    cin >> height;
+    cout << endl;
+    volume = length * width * height;
+    // Should the package dimensions exceed 65 cf, the user will be prompted to re-enter their input values.     
+    while (volume > 65)
+    {
+        cout << "This package exceeds the 65 cubic foot limit. Please input again." << "\n";
+        cout << "\n" << "Enter Package Dimensions (feet):";
+        cout << "\n" << "Length: ";
+        cin >> length;
+        cout << "Width: ";
+        cin >> width;
+        cout << "Height: ";
+        cin >> height;
+        cout << endl;
+        volume = length * width * height;
+        }
+    // This portion of code evaluates the shipping rate based on the volume of the package.
+    if (volume)
+    {
+        if (volume < 15)
+        {
+            smallRate = 1.50;
+            shippingCost = smallRate * volume;
+            perDollar = 0.0775;
+            salesTax = perDollar * shippingCost;
+            total = shippingCost + salesTax;
+        }
+        else if (volume > 15, volume < 45)
+        {
+            mediumRate = 2.50;
+            shippingCost = mediumRate * volume;
+            perDollar = 0.0775;
+            salesTax = perDollar * shippingCost;
+            total = shippingCost + salesTax;
+        }
+        else if (volume > 45)
+        {
+            largeRate = 3.00;
+            shippingCost = largeRate * volume;
+            perDollar = 0.0775;
+            salesTax = perDollar * shippingCost;
+            total = shippingCost + salesTax;
+        }
+    }
+    // This will display the calculated package volume.
+    cout << "Package Volume: ";
+    cout << volume << " cubic feet" << endl;
+    // This portion of code outputs the shipping rate based on the volume of the package.
+    if (volume)
+    {
+        if (volume < 15)
+        {
+            cout << setprecision(2) << fixed;
+	        cout <<"\n" << setw(45) << left << "Shipping Cost ($1.50 per cubic foot) " << setw(2) << left << "$ " << setw(8) << right << shippingCost << endl;
+        }
+        else if (volume > 15, volume < 45)
+        {
+            cout << setprecision(2) << fixed;
+	        cout <<"\n" << setw(45) << left << "Shipping Cost ($2.50 per cubic foot) " << setw(2) << left << "$ " << setw(8) << right << shippingCost << endl;
+        }
+        else if (volume > 45)
+        {
+            cout << setprecision(2) << fixed;
+	        cout <<"\n" << setw(45) << left << "Shipping Cost ($3.00 per cubic foot) " << setw(2) << left << "$ " << setw(8) << right << shippingCost << endl;
+        }
+    }
+    // This will display the sales tax and total.
+    cout << setprecision(2) << fixed;
+    cout << setw(45) << left << "Sales Tax (0.0775) " << setw(2) << left << "$ " << setw(8) << right << salesTax << endl << endl;
+    cout << setw(45) << left << "Total " << setw(2) << left << "$ " << setw(8) << right << total << endl;
+    
+    return 0;
+}
