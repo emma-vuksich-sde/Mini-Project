@@ -1,0 +1,145 @@
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+double getVolume(double, double, double);
+bool addPackage();
+
+int main() 
+{
+   
+    double length,
+    width,
+    height,
+    volume,
+    shippingCost,
+    smallRate,
+    mediumRate,
+    largeRate,
+    salesTax,
+    perDollar,
+    number,
+    subTotal,
+    totalTax,
+    total,
+    newTotal,
+    i;
+    char userAnswer;
+    
+    cout << "East County Box Company" << endl;
+    cout << "\n" << "Sales Program (version 1.5)" << endl;
+    
+    // Dimension entry and package details.
+    for (int count = i; count <= i; count++)
+    {
+        do
+        {
+            volume = getVolume(length, width, height);
+    
+            // Re-enter values if package volume exceeds 65 cf.    
+            while (volume > 65) 
+            {
+            cout << "This package exceeds the 65 cubic foot limit. Please input again." << "\n";
+            volume = getVolume(length, width, height);
+            }
+            
+            // Calculates the subtotal, tax, and total.
+            if (volume)
+            {
+                if (volume < 15)
+                {
+                    smallRate = 1.50;
+                    shippingCost = smallRate * volume;
+                    perDollar = 0.0775;
+                    salesTax = perDollar * shippingCost;
+                    total = shippingCost + totalTax + subTotal;
+                }
+                else if (volume > 15, volume < 45)
+                {
+                    mediumRate = 2.50;
+                    shippingCost = mediumRate * volume;
+                    perDollar = 0.0775;
+                    salesTax = perDollar * shippingCost;
+                    total = shippingCost + totalTax + subTotal;
+                }
+                else if (volume > 45)
+                {
+                    largeRate = 3.00;
+                    shippingCost = largeRate * volume;
+                    perDollar = 0.0775;
+                    salesTax = perDollar * shippingCost;
+                    total = shippingCost + totalTax + subTotal;
+                }
+                subTotal += shippingCost;
+                totalTax += salesTax;
+                newTotal = subTotal + totalTax;
+            }
+    
+            // Displays the calculated package volume.
+            cout << "Package Volume: ";
+            cout << volume << " cubic feet";
+    
+            // Outputs the shipping rate based on the volume of the package.
+            if (volume)
+            {
+                if (volume < 15)
+                {
+                    cout << setprecision(2) << fixed;
+                    cout <<"\n" << setw(45) << left << "Shipping Cost ($1.50 per cubic foot) " << setw(2) << left << "$ " << setw(8) << right << shippingCost << endl;
+                }
+                else if (volume > 15, volume < 45)
+                {
+                    cout << setprecision(2) << fixed;
+                    cout <<"\n" << setw(45) << left << "Shipping Cost ($2.50 per cubic foot) " << setw(2) << left << "$ " << setw(8) << right << shippingCost << endl;
+                }
+                else if (volume > 45)
+                {
+                    cout << setprecision(2) << fixed;
+                    cout <<"\n" << setw(45) << left << "Shipping Cost ($3.00 per cubic foot) " << setw(2) << left << "$ " << setw(8) << right << shippingCost << endl;
+                }
+            }
+        } while (addPackage() == true);
+    }
+    
+    // Displays the subtotal, sales tax, and total.
+    cout << setprecision(2) << fixed;
+    cout << "\n" << setw(45) << left << "Subtotal" << setw(2) << left << "$ " << setw(8) << right << subTotal << endl;
+    cout << setw(45) << left << "Sales Tax (0.0775) " << setw(2) << left << "$ " << setw(8) << right << totalTax << endl << endl;
+    cout << setw(45) << left << "Total " << setw(2) << left << "$ " << setw(8) << right << newTotal << endl;
+    
+    return 0;
+}
+
+// Gets package dimensions from user and outputs volume.
+double getVolume(double length, double width, double height)
+{
+    cout << "\n" << "Enter Package Dimensions (feet):" << endl;
+    cout << "Length: ";
+    cin >> length;
+    cout <<"Width: ";
+    cin >> width;
+    cout <<"Height: "; 
+    cin >> height;
+    cout << endl;
+    double volume = length * width * height;
+    return volume;
+}
+
+// Asks user if another package is being added to the transaction.
+bool addPackage()
+{
+    char answer;
+    cout << "\n" << "Add another package? (Y/N) ";
+    cin >> answer;
+    if (answer != 'Y' && answer != 'N')
+    {
+        cout << "\n" << "Please enter Y or N to continue." << endl;
+        cout << "\n" << "Add another package? (Y/N) ";
+        cin >> answer;
+    }
+    while (answer == 'N')
+    {
+        break;
+    }
+    return answer == 'Y';
+}
