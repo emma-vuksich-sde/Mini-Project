@@ -1,0 +1,730 @@
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <fstream>
+#include <vector>
+#include <cctype>
+#include <cmath>
+#include <ctime>
+#include <cstdlib>
+using namespace std;
+
+// Constant variables.
+const double smallRate = 1.50;
+const double mediumRate = 2.50;
+const double largeRate = 3.00;
+const double perDollar = 0.0775;
+const double deliveryRateFast = 1.50;
+const double deliveryRateAir = 3.00;
+
+struct Calculator
+{
+    int container = 0;
+    int transaction = 0;
+    int receiptDay = 0;
+    int receiptMonth = 0;
+    int receiptYear = 0;
+    double length = 0;
+    double width = 0;
+    double height = 0;
+    double volume = 0;
+    double premium = 0;
+    double shippingCost = 0;
+    double premiumDelivery = 0;
+    double premiumTotal = 0;
+    double containerTotal = 0;
+    double subtotal = 0;
+    double salesTax = 0;
+    double total = 0;
+    double cash = 0;
+    double change = 0;
+    char option;
+    char answer;
+    string customer_name;
+    string customer_date;
+    string selection;
+};
+
+struct Date
+{
+    int month;
+    int day;
+};
+
+// Function prototypes using structures.
+Calculator getVolume(Calculator);
+Calculator lengthSafety(Calculator);
+Calculator heightSafety(Calculator);
+Calculator widthSafety(Calculator);
+Calculator totals(Calculator);
+Calculator packageVolume(Calculator);
+Calculator shippingCosts(Calculator);
+Calculator calculateShipping(Calculator);
+Calculator deliveryMethod(Calculator);
+Calculator payment(Calculator);
+Calculator transaction(Calculator);
+Calculator addPackage(Calculator);
+Calculator getDate(Calculator);
+void displayNewInfo();
+void fillReceipt(Calculator);
+void grandTotal(Calculator);
+void printReceipt();
+
+int main() 
+{
+    int i;
+    
+    Calculator allData;
+
+    // Beginning of the output, displays the transaction info.
+    displayNewInfo();
+    allData = transaction(allData);
+    
+    for (int count = i; count <= i; count++)
+    {
+        do
+        {
+            // Increases the label of each container.
+            allData.container++;
+
+            // Asks user to enter package dimensions.
+            allData = getVolume(allData);
+            
+            // Re-enter values if package volume exceeds 65 cf.    
+            while (allData.volume > 65) 
+            {
+                cout << "This container exceeds the 65 cubic foot limit. Please input again." << "\n";
+                allData = getVolume(allData);
+            }
+            
+            // Calculates the shipping cost.
+            allData = calculateShipping(allData);
+            
+            // Displays the calculated package volume.
+            packageVolume(allData);
+            
+            // Outputs the shipping cost based on the volume of the package.
+            allData = shippingCosts(allData);
+            
+            // Displays the delivery options and requests user input.
+            allData = deliveryMethod(allData);
+            
+            // Asks user if another package will be added.
+            allData = addPackage(allData);
+            
+            // Calculates the container total.
+            allData.containerTotal += allData.shippingCost;
+            
+            // Calculates the premium delivery fee.
+            allData.premiumTotal += allData.premium;
+            
+            // Fills the file "c:\Receipt.txt" with data from the cashiering system.
+            fillReceipt(allData);
+            
+        } while (allData.answer == 'y');
+    }
+    
+    // Calculates the subtotal, sales tax, and grand total.
+    allData.subtotal = allData.containerTotal + allData.premiumTotal;
+    allData.salesTax = allData.subtotal * perDollar;
+    allData.total = allData.subtotal + allData.salesTax;
+    
+    // Displays the container total, premium delivery fee, subtotal, sales tax, and total.
+    cout << "\n" << "\n" << "\n" << "\n" << "\n";
+    cout << setprecision(2) << fixed;
+    cout << setw(60) << left << "Container Total" << setw(2) << left << "$ " << setw(8) << right << allData.containerTotal << endl;
+    cout << setw(60) << left << "Premium Delivery" << setw(2) << left << "$ " << setw(8) << right << allData.premiumTotal << endl;
+    cout << "\n" << setw(60) << left << "Subtotal" << setw(2) << left << "$ " << setw(8) << right << allData.subtotal << endl;
+    cout << setw(60) << left << "Sales Tax (0.0775)" << setw(2) << left << "$ " << setw(8) << right << allData.salesTax << endl << endl;
+    cout << setw(60) << left << "Total" << setw(2) << left << "$ " << setw(8) << right << allData.total << endl;
+    
+    allData = payment(allData);
+    
+    // Fills the file "c:\Receipt.txt" with data from the cashiering system.
+    ofstream fw;
+    fw.open("c:\\Receipt.txt", ios::app);
+    
+    if (fw.is_open())
+    {
+        fw << setprecision(2) << fixed;
+        fw << endl << setw(55) << left << "Subtotal" << setw(2) << left << "$ " << setw(8) << right << allData.subtotal << endl;
+        fw << setw(55) << left << "Sales Tax - 7.75%" << setw(2) << left << "$ " << setw(8) << right << allData.salesTax << endl << endl;
+        fw << setw(55) << left << "Total " << setw(2) << left << "$ " << setw(8) << right << allData.total << endl;
+    }
+    
+    fw.close();
+    
+    // Prints the text file "c:\Receipt.txt".
+    printReceipt();
+    
+    return 0;
+}
+
+// Requests and recieves package dimensions from user and outputs volume.
+Calculator getVolume(Calculator allData)
+{
+    cout << "\n" << "Enter dimensions for container #";
+    cout << setprecision(0) << allData.container;
+    cout << " (feet):" << endl;
+    cout << "Length: ";
+    allData = lengthSafety(allData);
+    cout << "\n" << "Width: ";
+    allData = heightSafety(allData);
+    cout << "\n" << "Height: "; 
+    allData = widthSafety(allData);
+
+    cout << endl;
+    
+    allData.volume = allData.length * allData.width * allData.height;
+
+    return allData;
+}
+
+// Validates user input.
+Calculator lengthSafety(Calculator allData)
+{
+    while (!(cin >> allData.length))
+    {
+        cout << "\n" << "Invalid input. Dimensions should be numeric values. Please try again." << endl;
+        cout << "\n" << "Length: ";
+        cin.clear();
+        cin.ignore(123, '\n');
+    }
+
+    return allData;
+}
+
+// Validates user input.
+Calculator heightSafety(Calculator allData)
+{
+    while (!(cin >> allData.height))
+    {
+        cout << "\n" << "Invalid input. Dimensions should be numeric values. Please try again." << endl;
+        cout << "\n" << "Height: ";
+        cin.clear();
+        cin.ignore(123, '\n');
+    }
+    
+    return allData;
+}
+
+// Validates user input.
+Calculator widthSafety(Calculator allData)
+{
+    while (!(cin >> allData.width))
+    {
+        cout << "\n" << "Invalid input. Dimensions should be numeric values. Please try again." << endl;
+        cout << "\n" << "Width: ";
+        cin.clear();
+        cin.ignore(123, '\n');
+    }
+    
+    return allData;
+}
+
+ // Displays the calculated package volume.
+Calculator packageVolume(Calculator allData)
+{
+    cout << "Volume of container #";
+    cout << setprecision(0) << fixed << allData.container;
+    cout << " is " << allData.volume << " cu ft";
+    
+    return allData;
+}
+
+// Asks user if another package is being added to the transaction.
+Calculator addPackage(Calculator allData)
+{
+    cout << "\n" << "Add another container? (y/n) ";
+    cin >> allData.answer;
+    if (allData.answer != 'y' && allData.answer != 'n')
+    {
+        cout << "\n" << "Invalid input. Please enter y or n to continue." << endl;
+        cout << "\n" << "Add another container? (y/n) ";
+        cin >> allData.answer;
+    }
+    
+    while (allData.answer == 'n')
+    {
+        break;
+    }
+    
+    return allData;
+}
+
+// Payment methods: cash, check, credit.
+Calculator payment(Calculator allData)
+{
+    char type, creditCard;
+    string driverLicense, fourDigits;
+    
+    cout << "\n" << "Payment (1. Cash, 2. Check, 3. Card): ";
+    cin >> type;
+
+    if (type != '1' && type != '2' && type != '3')
+    {
+        cout << "\n" << "Invalid input. Please enter 1, 2, or 3 to continue." << endl;
+        cout << "\n" << "Payment (1. Cash, 2. Check, 3. Card): ";
+        cin >> type;
+    }
+    
+    if (type == '1')
+    {   
+        if (allData.total < 99.99)
+        {
+            cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Accepted:" << setw(5) << left << "$" << setw(8) << right;
+            cin >> allData.cash;
+        }
+        if (allData.total >= 100.00)
+        {
+            cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Accepted:" << setw(4) << left << "$" << setw(8) << right;
+            cin >> allData.cash;
+        }
+        allData.change = allData.cash - allData.total;
+        cout << setprecision(2) << fixed << setw(60) << left << "Change:" << setw(2) << left << "$ " << setw(8) << right << allData.change << endl;
+        cout << "\n";
+    }
+    
+    if (type == '2')
+    {
+        cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Enter Driver License No:" << setw(0) << left << "" << setw(8) << right;
+        cin >> driverLicense;
+        while (driverLicense.size() != 8)
+        {
+            cout << "\n" << "Invalid input. California driver's license require eight digits. Please try again." << endl;
+            cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Enter Driver License No:" << setw(0) << left << "" << setw(8) << right;
+            cin >> driverLicense;
+        }
+        while (!isalpha(driverLicense[0]))
+        {
+            cout << "\n" << "Invalid input. First digit should be a capital letter. Please try again." << endl;
+            cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Enter Driver License No:" << setw(0) << left << "" << setw(8) << right;
+            cin >> driverLicense;
+        }
+        int flag = 1;
+        while (flag == 1)
+        {
+            flag = 0;
+            for (int i = 1; i < driverLicense.size(); i++)
+            {
+                if(!isdigit(driverLicense[i]))
+                {
+                    flag = 1;
+                }
+            }
+            if (flag == 1)
+            {
+                cout << "\n" << "Invalid input. Last seven digits should be numbers. Please try again." << endl;
+                cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Enter Driver License No:" << setw(0) << left << "" << setw(8) << right;
+                cin >> driverLicense;
+            }
+        }
+        cout << setprecision(2) << fixed << setw(60) << left << "Accepted Check Payment:" << setw(2) << left << "$ " << setw(8) << right << allData.total << endl;
+        cout << "\n";
+    }
+    
+    if (type == '3')
+    {
+        cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Visa (V) or Mastercard (M):" << setw(0) << left << "" << setw(8) << right;
+        cin >> creditCard;
+        
+        while (creditCard != 'V' && creditCard != 'M')
+        {
+            cout << "\n" << "Invalid input. Please enter V for Visa or M for Mastercard to continue. Please try again." << endl;
+            cout << setprecision(2) << fixed << "\n" << setw(70) << left << "Visa (V) or Mastercard (M):" << setw(0) << left << "" << setw(8) << right;
+            cin >> creditCard;
+        }
+        cout << setprecision(2) << fixed << setw(60) << left << "Enter Last Four Digits of Card:" << setw(0) << left << "" << setw(8) << right;
+        cin >> fourDigits;
+        int flag = 1;
+        while (fourDigits.size() != 4 || flag == 1)
+        {
+            if (fourDigits.size() != 4)
+            {
+                cout << "\n" << "Invalid input. Please enter valid four digits to continue. Please try again." << endl;
+                cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Enter the last four digits of the card:" << setw(0) << left << "" << setw(8) << right;
+                cin >> fourDigits;
+            }
+            flag = 0;
+            for (int i = 0; i < fourDigits.size(); i++)
+            {
+                if(!isdigit(fourDigits[i]))
+                {
+                    flag = 1;
+                }
+            }
+            if (flag == 1)
+            {
+                cout << "\n" << "Invalid input. Please enter valid four digits to continue. Please try again." << endl;
+                cout << setprecision(2) << fixed<< "\n" << setw(60) << left << "Enter the last four digits of the card:" << setw(0) << left << "" << setw(8) << right;
+                cin >> fourDigits;
+            }
+        }
+        
+        if (creditCard == 'V')
+        {
+            cout << "Accepted Visa ending in " << fourDigits << " for the amount of:";
+            cout << setprecision(2) << fixed << setw(13) << left << "" << setw(2) << left << "$ " << setw(8) << right << allData.total << endl;
+            cout << "\n";
+        }
+        
+        if (creditCard == 'M')
+        {
+            cout << "Accepted Mastercard ending in " << fourDigits << " for the amount of:";
+            cout << setprecision(2) << fixed << setw(7) << left << "" << setw(2) << left << "$ " << setw(8) << right << allData.total << endl;
+            cout << "\n";
+        }
+    }
+    return allData;
+}
+
+Calculator deliveryMethod(Calculator allData)
+{
+    allData.premium = 0;
+    
+    if (allData.volume < 30)
+    {
+        cout << "\n" << "How is this container to be shipped (choose one):" << endl;
+        cout << "\n" << "(1) Standard - (one to two weeks) - No change to the price" << endl;
+        cout << "(2) Fast Ground - (3 to 5 business days) - Extra $1.50 per cubic foot" << endl;
+        cout << "(3) Air - (1 to 2 business days) - Only applies to packages under 30 cubic feet - Extra $3.00 per cubic foot" << endl;
+        cout << "\n" << "Delivery Method: ";
+    }
+    
+    if (allData.volume >= 30)
+    {
+        cout << "\n" << "How is this container to be shipped (choose one):" << endl;
+        cout << "\n" << "(1) Standard - (one to two weeks) - No change to the price" << endl;
+        cout << "(2) Fast Ground - (3 to 5 business days) - Extra $1.50 per cubic foot" << endl;
+        cout << "\n" << "Delivery Method: ";
+    }
+    
+    cin >> allData.option;
+    
+    if (allData.option != '1' && allData.option != '2' && allData.option != '3')
+    {
+        cout << "\n" << "Invalid input. Please enter 1, 2, or 3 to continue." << endl;
+        cout << "\n" << "Delivery Method: ";
+        cin >> allData.option;
+    }
+    
+    if (allData.volume >= 30 && allData.option == '3')
+    {
+        cout << "\n" << "Air delivery only applies to packages under 30 cubic feet. Please try again." << endl;
+        cout << "\n" << "Delivery Method: ";
+        cin >> allData.option;
+    }
+    
+    switch (allData.option)
+    {
+        case '1' : 
+        {
+            allData.premium = allData.volume * 0;
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(0) << left << "Standard: " << setw(2) << left << " $" << setw(0) << right << allData.premium << endl;
+        }
+        break;
+        
+        case '2' :
+        {
+            allData.premium = allData.volume * deliveryRateFast;
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(0) << left << "Fast Ground ($1.50 per cu ft): " << setw(2) << left << " $" << setw(0) << right << allData.premium << endl;
+        }
+        break;
+        
+        case '3' :
+        {
+            allData.premium = allData.volume * deliveryRateAir;
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(0) << left << "Air ($3.00 per cu ft): " << setw(2) << left << " $" << setw(0) << right << allData.premium << endl;
+        }
+        break;
+    }
+    
+    allData = getDate(allData);
+    
+    return allData;
+}
+
+Calculator calculateShipping(Calculator allData)
+{
+    if (allData.volume)
+    {
+        if (allData.volume < 15)
+        {
+            allData.shippingCost = smallRate * allData.volume;
+        }
+        else if (allData.volume > 15, allData.volume < 45)
+        {
+            allData.shippingCost = mediumRate * allData.volume;
+        }
+        else if (allData.volume > 45)
+        {
+            allData.shippingCost = largeRate * allData.volume;
+        }
+    }
+    
+    return allData;
+}
+
+Calculator shippingCosts(Calculator allData)
+{
+    if (allData.volume)
+    {
+        if (allData.volume < 15)
+        {
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(2) << left << "Small Package ($1.50 per cubic foot): " << setw(2) << left << " $" << setw(0) << right << allData.shippingCost << endl;
+        }
+        else if (allData.volume > 15, allData.volume < 45)
+        {
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(0) << left << "Medium Package ($2.50 per cubic foot): " << setw(2) << left << " $" << setw(0) << right << allData.shippingCost << endl;
+        }
+        else if (allData.volume > 45)
+        {
+            cout << setprecision(2) << fixed;
+            cout <<"\n" << setw(0) << left << "Large Package ($3.00 per cubic foot): " << setw(2) << left << " $" << setw(0) << right << allData.shippingCost << endl;
+        }
+    }
+    
+    return allData;
+}
+
+void displayNewInfo()
+{
+    cout << "****East County Cargo Transport****" << endl;
+    cout << "\n" << "Cashiering system 2.0" << endl;
+}
+
+Calculator transaction(Calculator allData)
+{
+    cout << "Starting Transactions - date - ";
+    getline(cin, allData.customer_date);
+
+    cout << "\n" << "Starting at Transaction " << ++allData.transaction << endl;
+
+    bool valid;
+    do 
+    {
+        cout << "\n" << "Enter Customer's name: ";
+        getline(cin, allData.customer_name);
+        valid = true;
+        for (size_t i{}; i < allData.customer_name.length() && valid; ++i) {
+            if (!(isalpha(static_cast<unsigned char>(allData.customer_name[i])) ||
+                  isspace(static_cast<unsigned char>(allData.customer_name[i]))))
+            {
+                valid = false;
+                cout << "\n" << "Invalid input. Customer's name should only contain letters and spaces. Please try again." << endl;
+            }
+        }
+    } while (!valid);
+    
+    cout << "\n" << "Customer: " << allData.customer_name << endl;
+    
+    ofstream fw("c:\\Receipt.txt", ios::out);
+        if (fw.is_open())
+        {
+                fw << "________________________________________________________________________" << "\n" << endl;
+                fw << "East County Cargo Transport" << endl << endl;
+                fw << "123 First Street" << "\n";
+                fw << "El Cajon, CA  92071" << "\n";
+                fw << endl << "Customer Receipt - " << allData.customer_date << endl;
+                fw << endl << "Customer Name: " << allData.customer_name << endl;
+        }
+        
+        fw.close();
+        
+    return allData;
+}
+
+void fillReceipt(Calculator allData)
+{
+    int len = 34;
+    int len2 = 15;
+    ofstream fw("c:\\Receipt.txt", ios::out | ios::app);
+
+    if (fw.is_open())
+    {
+        fw << endl << setw(10) << left << "Container #" << allData.container << " - " << setw(2) << left << allData.volume << setw(5) << left << " cu ft" << setprecision(2) << fixed  << setw(len) << right <<  "$ " << setw(8) << right <<  allData.containerTotal << endl;
+        fw << "Shipping: " <<  setw(3) << left <<  allData.selection << " - " << "Est. Delivery" << " - " << setfill('0') << setw(2) << right << allData.receiptMonth << "/";
+        fw << setfill('0') << setw(2) << right << allData.receiptDay << "/";
+        fw << allData.receiptYear << setfill(' ') << setw(len2)  << right << "$ " << setw(8) << right << allData.premium << endl;
+    }
+    
+    fw.close();
+}
+
+void grandTotal(Calculator allData)
+{
+    fstream fw;
+    
+    fw.open("c:\\Receipt.txt", ios::app);
+    
+    if (fw.is_open())
+    {
+        fw << setprecision(2) << fixed;
+        fw << endl << setw(55) << left << "Subtotal" << setw(2) << left << "$ " << setw(8) << right << allData.subtotal << endl;
+        fw << setw(55) << left << "Sales Tax - 7.75%" << setw(2) << left << "$ " << setw(8) << right << allData.salesTax << endl << endl;
+        fw << setw(55) << left << "Total " << setw(2) << left << "$ " << setw(8) << right << allData.total << endl;
+    }
+    
+    fw.close();
+}
+
+void printReceipt()
+{
+    string output;
+    fstream fw;
+    
+    fw.open("c:\\Receipt.txt", ios::in);
+
+    if (fw)
+    {
+        getline(fw, output);
+        while (fw)
+        {
+            cout << output << endl;
+            getline(fw, output);
+        }
+    }
+    
+    fw.close();
+}
+
+Calculator getDate(Calculator allData)
+{
+    char monthTemp[3], dayTemp[3], yearTemp[5];
+    int month1, day1, year1, month2, day2;
+    Date counter[12] = {{1,31}, {2,28}, {3,31}, {4,30}, {5,31}, {6,30}, {7,31},{8,31}, {9,30}, {10,31}, {11,30}, {12,31}};
+   
+    monthTemp[0] = allData.customer_date[0];
+    monthTemp[1] = allData.customer_date[1];
+    monthTemp[2] = '\0';
+
+    dayTemp[0] = allData.customer_date[3];
+    dayTemp[1] = allData.customer_date[4];
+    dayTemp[2] = '\0';
+
+    yearTemp[0] = allData.customer_date[6];
+    yearTemp[1] = allData.customer_date[7];
+    yearTemp[2] = allData.customer_date[8];
+    yearTemp[3] = allData.customer_date[9];
+    yearTemp[4] = '\0';
+
+    month1 = atoi(monthTemp);
+    day1 = atoi(dayTemp);
+    year1 = atoi(yearTemp);
+    
+
+    switch (allData.option)
+    {
+        case '1' :
+        {
+            allData.selection = "STD";
+            day2 = 14 + day1;
+            
+            if (day2 > counter[month1 - 1].day)
+            {
+                day2 = day2 - counter[month1 - 1].day;
+                
+                if ((month1 + 1) == 13)
+                {
+                    year1 += 1;
+                    month2 = 1;
+                    allData.receiptMonth = month2;
+                    allData.receiptDay = day2;
+                    allData.receiptYear = year1;
+                }
+                else
+                {
+                    month1 += 1;
+                    allData.receiptMonth = month1;
+                    allData.receiptDay = day2;
+                    allData.receiptYear = year1;
+                }
+            }
+            else
+            {
+                allData.receiptMonth = month1;
+                allData.receiptDay = day2;
+                allData.receiptYear = year1;
+            }
+            
+            break;
+        }
+        
+        case '2' :
+        {
+            allData.selection = "FG";
+            day2 = 5 + day1;
+            
+            if (day2 > counter[month1 - 1].day)
+            {
+                day2 = day2 - counter[month1 - 1].day;
+                
+                if ((month1 + 1) == 13)
+                {
+                    year1 += 1;
+                    month2 = 1;
+                    allData.receiptMonth = month2;
+                    allData.receiptDay = day2;
+                    allData.receiptYear = year1;
+                }
+                else
+                {
+                    month1 += 1;
+                    allData.receiptMonth = month1;
+                    allData.receiptDay = day2;
+                    allData.receiptYear = year1;
+                }
+            }
+            else
+            {
+                allData.receiptMonth = month1;
+                allData.receiptDay = day2;
+                allData.receiptYear = year1;
+            }
+            
+            break;
+        }
+        
+        case '3' :
+        {
+            allData.selection = "AIR";
+            day2 = 2 + day1;
+            
+            if (day2 > counter[month1 - 1].day)
+            {
+                day2 = day2 - counter[month1 - 1].day;
+                
+                if ((month1 + 1) == 13)
+                {
+                    year1 += 1;
+                    month2 = 1;
+                    allData.receiptMonth = month2;
+                    allData.receiptDay = day2;
+                    allData.receiptYear = year1;
+                }
+                else
+                {
+                    month1 += 1;
+                    allData.receiptMonth = month1;
+                    allData.receiptDay = day2;
+                    allData.receiptYear = year1;
+                }
+            }
+            else
+            {
+                allData.receiptMonth = month1;
+                allData.receiptDay = day2;
+                allData.receiptYear = year1;
+            }
+            
+            break;
+        }
+    }
+    
+    return allData;
+}
