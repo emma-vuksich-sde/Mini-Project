@@ -280,6 +280,13 @@ Calculator payment(Calculator allData)
             cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Accepted:" << setw(4) << left << "$" << setw(8) << right;
             cin >> allData.cash;
         }
+        do
+        {
+            cout << "\n" << "Insufficent funds. Total is $" << allData.total << ". Please try again." << endl;
+            cout << setprecision(2) << fixed << "\n" << setw(60) << left << "Accepted:" << setw(4) << left << "$" << setw(8) << right;
+            cin >> allData.cash;
+        } while (allData.cash < allData.total);
+
         allData.change = allData.cash - allData.total;
         cout << setprecision(2) << fixed << setw(60) << left << "Change:" << setw(2) << left << "$ " << setw(8) << right << allData.change << endl;
         cout << "\n";
